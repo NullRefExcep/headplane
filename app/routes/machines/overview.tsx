@@ -73,6 +73,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const populatedNodes = mapNodes(nodes, stats);
   const supportsNodeOwnerChange = !headscale.capabilities.nodeOwnerIsImmutable;
   const supportsDisablingKeyExpiry = headscale.capabilities.keyExpiryCanBeDisabled;
+  const supportsChangingNodeIPs = headscale.capabilities.nodeIPsCanBeChanged;
   const agentSync = agents?.lastSync();
 
   return {
@@ -95,6 +96,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     server: config.headscale.url,
     supportsNodeOwnerChange: supportsNodeOwnerChange,
     supportsDisablingKeyExpiry: supportsDisablingKeyExpiry,
+    supportsChangingNodeIPs: supportsChangingNodeIPs,
     users,
     writable: writablePermission,
   };
@@ -469,6 +471,7 @@ export default function Page({ loaderData }: Route.ComponentProps) {
                   users={loaderData.users}
                   supportsNodeOwnerChange={loaderData.supportsNodeOwnerChange}
                   supportsDisablingKeyExpiry={loaderData.supportsDisablingKeyExpiry}
+                  supportsChangingNodeIPs={loaderData.supportsChangingNodeIPs}
                 />
               ))
             )}

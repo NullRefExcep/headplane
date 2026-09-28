@@ -41,6 +41,24 @@ describe("Headscale API path encoding", () => {
     ]);
   });
 
+  test("sets node IP addresses through the node IP endpoint", async () => {
+    const { calls, transport } = createTransportRecorder();
+
+    await makeNodeApi(transport, capabilities, "api-key").setIPs("2", [
+      "100.64.20.30",
+      "fd7a:115c:a1e0::1234",
+    ]);
+
+    expect(calls).toEqual([
+      {
+        method: "POST",
+        path: "v1/node/2/ip",
+        apiKey: "api-key",
+        body: { ipAddresses: ["100.64.20.30", "fd7a:115c:a1e0::1234"] },
+      },
+    ]);
+  });
+
   test("encodes user rename names as a single URL segment", async () => {
     const { calls, transport } = createTransportRecorder();
 

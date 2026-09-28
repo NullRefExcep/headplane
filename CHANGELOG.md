@@ -4,6 +4,8 @@
 
 ## Changes
 
+- Added machine IP address editing for Headscale development builds that provide the node IP assignment API.
+
 - **Rebuilt the Browser SSH module to use Tailscale's `tsconnect`**, which should result in fewer bugs and better compatibility with future Tailscale releases.
 - Added `integration.agent.tailscale_netns`, an agent-only opt-out from Tailscale's routing-loop socket handling for deployments where its fallback pins the agent's Headscale connection to the wrong interface. Existing behavior remains enabled by default.
 - Added a Disable/Enable key expiry action to the machine menu (via [#554](https://github.com/tale/headplane/pull/554)). Headscale does not keep the toggle state apart from the expiry date, so re-enabling expiry marks the node expired as of that moment.

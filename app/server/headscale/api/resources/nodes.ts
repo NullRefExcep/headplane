@@ -18,6 +18,7 @@ export interface NodeApi {
   approveRoutes(id: string, routes: string[]): Promise<void>;
   expire(id: string): Promise<void>;
   rename(id: string, newName: string): Promise<void>;
+  setIPs(id: string, ipAddresses: string[]): Promise<void>;
   setTags(id: string, tags: string[]): Promise<void>;
   toggleExpiry(nodeId: string, disableExpiry: boolean): Promise<void>;
   /**
@@ -95,6 +96,14 @@ export function makeNodeApi(
         method: "POST",
         path: `v1/node/${id}/rename/${encodeURIComponent(newName)}`,
         apiKey,
+      });
+    },
+    setIPs: async (id, ipAddresses) => {
+      await transport.request({
+        method: "POST",
+        path: `v1/node/${id}/ip`,
+        apiKey,
+        body: { ipAddresses },
       });
     },
     setTags: async (id, tags) => {

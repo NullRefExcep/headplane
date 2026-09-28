@@ -99,6 +99,7 @@ describe("capabilitiesFor", () => {
       nodeOwnerIsImmutable: true,
       registerKeyIncludesAuthReqPrefix: false,
       keyExpiryCanBeDisabled: false,
+      nodeIPsCanBeChanged: false,
     });
   });
 
@@ -111,6 +112,12 @@ describe("capabilitiesFor", () => {
   test("0.29.0 enables the prefixed AuthID register key", () => {
     const caps = capabilitiesFor(parseServerVersion("0.29.0"));
     expect(caps.registerKeyIncludesAuthReqPrefix).toBe(true);
+  });
+
+  test("development builds and 0.30.0 enable changing node IP addresses", () => {
+    expect(capabilitiesFor(parseServerVersion("dev")).nodeIPsCanBeChanged).toBe(true);
+    expect(capabilitiesFor(parseServerVersion("0.29.0")).nodeIPsCanBeChanged).toBe(false);
+    expect(capabilitiesFor(parseServerVersion("0.30.0")).nodeIPsCanBeChanged).toBe(true);
   });
 
   test("0.27.1 lacks every 0.28-gated capability", () => {

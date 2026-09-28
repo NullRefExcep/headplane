@@ -30,6 +30,7 @@ interface Props {
   policyTags?: string[];
   supportsNodeOwnerChange: boolean;
   supportsDisablingKeyExpiry: boolean;
+  supportsChangingNodeIPs: boolean;
 }
 
 export default function MachineRow({
@@ -42,6 +43,7 @@ export default function MachineRow({
   policyTags,
   supportsNodeOwnerChange,
   supportsDisablingKeyExpiry,
+  supportsChangingNodeIPs,
 }: Props) {
   const uiTags = useMemo(() => uiTagsForNode(node, isAgent), [node, isAgent]);
 
@@ -150,6 +152,7 @@ export default function MachineRow({
           users={users}
           supportsNodeOwnerChange={supportsNodeOwnerChange}
           supportsDisablingKeyExpiry={supportsDisablingKeyExpiry}
+          supportsChangingNodeIPs={supportsChangingNodeIPs}
         />
       </td>
     </tr>

@@ -49,6 +49,13 @@ export interface Capabilities {
    * Disabling of key expiry was introduced in 0.29.0.
    */
   readonly keyExpiryCanBeDisabled: boolean;
+
+  /**
+   * A node's IPv4 and IPv6 addresses can be assigned through
+   * `POST /api/v1/node/{id}/ip`. Available in development builds and
+   * expected in Headscale 0.30.0.
+   */
+  readonly nodeIPsCanBeChanged: boolean;
 }
 
 export function capabilitiesFor(version: ServerVersion): Capabilities {
@@ -58,5 +65,6 @@ export function capabilitiesFor(version: ServerVersion): Capabilities {
     nodeOwnerIsImmutable: gte(version, "0.28.0"),
     registerKeyIncludesAuthReqPrefix: gte(version, "0.29.0"),
     keyExpiryCanBeDisabled: gte(version, "0.29.0"),
+    nodeIPsCanBeChanged: gte(version, "0.30.0"),
   };
 }

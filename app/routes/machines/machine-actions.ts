@@ -204,6 +204,37 @@ export async function machineAction({ request, context }: Route.ActionArgs) {
       return { message: "Routes updated" };
     }
 
+    case "update_ips": {
+      const ipAddresses = [formData.get("ipv4"), formData.get("ipv6")]
+        .map((value) => value?.toString().trim() ?? "")
+        .filter((value) => value.length > 0);
+
+      if (ipAddresses.length === 0) {
+        return data(
+          { success: false as const, error: "Provide at least one IP address." },
+          { status: 400 },
+        );
+      }
+
+      try {
+        await api.nodes.setIPs(nodeId, ipAddresses);
+        await headscaleLiveStore.refresh(nodesResource, api);
+        return { success: true as const, message: "IP addresses updated" };
+      } catch (error) {
+        if (isDataWithApiError(error) && [400, 404, 409, 422].includes(error.data.statusCode)) {
+          return data(
+            {
+              success: false as const,
+              error: extractApiErrorMessage(error.data) ?? "Could not update IP addresses.",
+            },
+            { status: error.data.statusCode },
+          );
+        }
+
+        throw error;
+      }
+    }
+
     case "reassign": {
       const user = formData.get("user_id")?.toString();
       if (!user) {
@@ -230,10 +261,24 @@ export async function machineAction({ request, context }: Route.ActionArgs) {
 }
 
 function extractApiErrorMessage(error: { data?: unknown; rawData: string }) {
-  if (error.data != null && typeof error.data === "object" && "message" in error.data) {
-    const message = (error.data as { message?: unknown }).message;
-    if (typeof message === "string" && message.length > 0) {
-      return message;
+  if (error.data != null && typeof error.data === "object") {
+    const problem = error.data as Record<string, unknown>;
+    for (const key of ["message", "detail", "title"] as const) {
+      const message = problem[key];
+      if (typeof message === "string" && message.length > 0) {
+        return message;
+      }
+    }
+
+    if (Array.isArray(problem.errors)) {
+      for (const item of problem.errors) {
+        if (item != null && typeof item === "object" && "message" in item) {
+          const message = (item as { message?: unknown }).message;
+          if (typeof message === "string" && message.length > 0) {
+            return message;
+          }
+        }
+      }
     }
   }
 

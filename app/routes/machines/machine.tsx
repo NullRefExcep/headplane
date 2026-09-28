@@ -67,6 +67,7 @@ export async function loader({ request, params, context }: Route.LoaderArgs) {
   const tags = [...node.tags].toSorted();
   const supportsNodeOwnerChange = !headscale.capabilities.nodeOwnerIsImmutable;
   const supportsDisablingKeyExpiry = headscale.capabilities.keyExpiryCanBeDisabled;
+  const supportsChangingNodeIPs = headscale.capabilities.nodeIPsCanBeChanged;
   const agentSync = agents?.lastSync();
   const policy = policyResult.status === "fulfilled" ? policyResult.value.policy : undefined;
 
@@ -86,6 +87,7 @@ export async function loader({ request, params, context }: Route.LoaderArgs) {
     stats: stats?.[enhancedNode.nodeKey],
     supportsNodeOwnerChange: supportsNodeOwnerChange,
     supportsDisablingKeyExpiry: supportsDisablingKeyExpiry,
+    supportsChangingNodeIPs: supportsChangingNodeIPs,
     tags,
     users,
   };
@@ -105,6 +107,7 @@ export default function Page({
     policyTags,
     supportsNodeOwnerChange,
     supportsDisablingKeyExpiry,
+    supportsChangingNodeIPs,
   },
 }: Route.ComponentProps) {
   const [showRouting, setShowRouting] = useState(false);
@@ -142,6 +145,7 @@ export default function Page({
           users={users}
           supportsNodeOwnerChange={supportsNodeOwnerChange}
           supportsDisablingKeyExpiry={supportsDisablingKeyExpiry}
+          supportsChangingNodeIPs={supportsChangingNodeIPs}
         />
       </div>
       <div className="mb-4 flex gap-1">

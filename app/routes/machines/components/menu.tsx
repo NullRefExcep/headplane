@@ -10,6 +10,7 @@ import { isNoExpiry, type PopulatedNode } from "~/utils/node-info";
 
 import Delete from "../dialogs/delete";
 import Expire from "../dialogs/expire";
+import IPAddresses from "../dialogs/ip-addresses";
 import Move from "../dialogs/move";
 import Rename from "../dialogs/rename";
 import Routes from "../dialogs/routes";
@@ -25,9 +26,10 @@ interface MenuProps {
   policyTags?: string[];
   supportsNodeOwnerChange: boolean;
   supportsDisablingKeyExpiry: boolean;
+  supportsChangingNodeIPs: boolean;
 }
 
-type Modal = "rename" | "expire" | "remove" | "routes" | "move" | "tags" | null;
+type Modal = "rename" | "ip-addresses" | "expire" | "remove" | "routes" | "move" | "tags" | null;
 
 export default function MachineMenu({
   node,
@@ -39,6 +41,7 @@ export default function MachineMenu({
   policyTags,
   supportsNodeOwnerChange,
   supportsDisablingKeyExpiry,
+  supportsChangingNodeIPs,
 }: MenuProps) {
   const submit = useSubmit();
   const [modal, setModal] = useState<Modal>(null);
@@ -70,6 +73,15 @@ export default function MachineMenu({
           isOpen={modal === "rename"}
           machine={node}
           magic={magic}
+          setIsOpen={(isOpen) => {
+            if (!isOpen) setModal(null);
+          }}
+        />
+      )}
+      {modal === "ip-addresses" && (
+        <IPAddresses
+          isOpen={modal === "ip-addresses"}
+          machine={node}
           setIsOpen={(isOpen) => {
             if (!isOpen) setModal(null);
           }}
@@ -163,6 +175,9 @@ export default function MachineMenu({
         </MenuTrigger>
         <MenuContent>
           <MenuItem onClick={() => setModal("rename")}>Edit machine name</MenuItem>
+          {supportsChangingNodeIPs && (
+            <MenuItem onClick={() => setModal("ip-addresses")}>Edit IP addresses</MenuItem>
+          )}
           {supportsDisablingKeyExpiry && (
             <MenuItem
               onClick={() =>
