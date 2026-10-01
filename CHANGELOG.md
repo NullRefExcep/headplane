@@ -1,5 +1,17 @@
 # Next
 
+Building Headplane from source now requires Go 1.27.1 or newer.
+
+## Changes
+
+- Added `config.oidc.jwks_endpoint` to allow manually setting the JWKs keyset for OIDC (via [#620](https://github.com/tale/headplane/pull/620)).
+
+## Fixes
+
+- Fixed copying code, attributes, and machine addresses over plain HTTP, and added feedback when copying fails (closes [#597](https://github.com/tale/headplane/issues/597)).
+- Updated NPM & Go dependencies to fix vulnerabilities.
+- Fixed the Native installation documentation as it was outdated and missing steps (via [#633](https://github.com/tale/headplane/pull/633)).
+
 # 0.7.1 (August 27, 2026)
 
 ## Changes
