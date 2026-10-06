@@ -5,6 +5,7 @@ import {
   Globe,
   Lock,
   Monitor,
+  Network,
   Moon,
   Server,
   Settings,
@@ -43,6 +44,7 @@ export interface HeaderProps {
 const tabs = [
   { to: "/machines", icon: Server, label: "Machines", key: "machines" },
   { to: "/users", icon: Users, label: "Users", key: "users" },
+  { to: "/network", icon: Network, label: "Network", key: "policy" },
   { to: "/acls", icon: Lock, label: "Access Control", key: "policy" },
   { to: "/dns", icon: Globe, label: "DNS", key: "dns" },
   { to: "/settings", icon: Settings, label: "Settings", key: "settings" },

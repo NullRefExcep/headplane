@@ -4,6 +4,8 @@ Building Headplane from source now requires Go 1.27.1 or newer.
 
 ## Changes
 
+- Explore machine ACL permissions in a compact network graph with directional arrows, incoming/outgoing colors, search and connection details.
+
 - Added `config.oidc.jwks_endpoint` to allow manually setting the JWKs keyset for OIDC (via [#620](https://github.com/tale/headplane/pull/620)).
 
 ## Fixes

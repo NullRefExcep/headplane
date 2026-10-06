@@ -27,6 +27,7 @@ export default [
     ]),
 
     route("/users", "routes/users/overview.tsx"),
+    route("/network", "routes/network/overview.tsx"),
     route("/acls", "routes/acls/overview.tsx"),
     route("/dns", "routes/dns/overview.tsx"),
 
