@@ -178,13 +178,17 @@ export function hasPortSpec(destination: string): boolean {
 
 const ALIAS_PREFIXES = ["tag:", "group:", "autogroup:"];
 
-// Only a prefixed alias or an IPv6 address carries an inner colon.
+// Prefixed aliases, IPv6 addresses and OIDC user identifiers can contain colons.
 function isCompleteDestination(value: string): boolean {
   if (value.length === 0 || value.endsWith(":")) {
     return false;
   }
 
-  if (ALIAS_PREFIXES.some((prefix) => value.startsWith(prefix)) || !value.includes(":")) {
+  if (
+    value.includes("@") ||
+    ALIAS_PREFIXES.some((prefix) => value.startsWith(prefix)) ||
+    !value.includes(":")
+  ) {
     return true;
   }
 

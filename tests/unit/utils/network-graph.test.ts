@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import type { Machine } from "~/types";
+import type { Machine, User } from "~/types";
 import { buildNetworkGraph } from "~/utils/network-graph";
 
 const nodes = [
@@ -87,4 +87,73 @@ describe("network ACL graph", () => {
     expect(result.edges).toEqual([]);
     expect(result.warnings).toHaveLength(2);
   });
+});
+
+describe("Headscale user identity resolution", () => {
+  const oidcNodes = [
+    {
+      ...nodes[0],
+      user: {
+        id: "oidc",
+        name: "user-uuid",
+        email: "alice@example.com",
+        providerId: "https://id.example.com/alice",
+      },
+    },
+    nodes[2],
+  ] as Machine[];
+  const rule = (identity: string) =>
+    JSON.stringify({
+      groups: { "group:admins": [identity] },
+      acls: [{ action: "accept", src: ["group:admins"], dst: ["tag:server:80,443"], proto: "tcp" }],
+    });
+  test("resolves OIDC provider identifiers used by production groups", () => {
+    const result = buildNetworkGraph(oidcNodes, rule("https://id.example.com/alice@"));
+    expect(result.edges).toEqual([{ source: "1", target: "3", permissions: ["tcp · 80,443"] }]);
+    expect(result.warnings).toEqual([]);
+  });
+  test("trims trailing @ from both email and name references", () => {
+    for (const identity of ["alice@example.com", "alice@example.com@", "user-uuid@"])
+      expect(buildNetworkGraph(oidcNodes, rule(identity)).edges).toHaveLength(1);
+  });
+  test("provider identifier wins over another user's matching name", () => {
+    const catalog = [
+      oidcNodes[0].user!,
+      { id: "other", name: "https://id.example.com/alice" },
+    ] as User[];
+    expect(
+      buildNetworkGraph(oidcNodes, rule("https://id.example.com/alice@"), catalog).edges,
+    ).toHaveLength(1);
+  });
+  test("does not grant ambiguous name/email access, including users without machines", () => {
+    const catalog = [oidcNodes[0].user!, { id: "other", name: "alice@example.com" }] as User[];
+    const result = buildNetworkGraph(oidcNodes, rule("alice@example.com@"), catalog);
+    expect(result.edges).toEqual([]);
+    expect(result.warnings).not.toEqual([]);
+  });
+});
+
+test("OIDC user destination with URL scheme keeps its port spec", () => {
+  const oidcNodes = [
+    {
+      ...nodes[0],
+      user: { id: "oidc", name: "user-uuid", providerId: "https://id.example.com/alice" },
+    },
+    nodes[2],
+  ] as Machine[];
+  const result = buildNetworkGraph(
+    oidcNodes,
+    JSON.stringify({
+      acls: [
+        {
+          action: "accept",
+          src: ["tag:server"],
+          dst: ["https://id.example.com/alice@:443"],
+          proto: "tcp",
+        },
+      ],
+    }),
+  );
+  expect(result.edges).toEqual([{ source: "3", target: "1", permissions: ["tcp · 443"] }]);
+  expect(result.warnings).toEqual([]);
 });

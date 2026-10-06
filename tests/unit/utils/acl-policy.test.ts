@@ -335,3 +335,12 @@ describe("validation", () => {
     expect(isValidHostName("tag:web")).toBe(false);
   });
 });
+
+test("OIDC user destinations with a URL scheme already have ports", () => {
+  const destination = "https://identity.example.com/user-uuid@:80,443";
+  expect(hasPortSpec(destination)).toBe(true);
+  expect(withDefaultPort(destination)).toBe(destination);
+  expect(withDefaultPort("https://identity.example.com/user-uuid@")).toBe(
+    "https://identity.example.com/user-uuid@:*",
+  );
+});
