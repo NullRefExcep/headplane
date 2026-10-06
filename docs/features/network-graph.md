@@ -19,6 +19,9 @@ A connection means at least one protocol/port is permitted; the panel shows the
 actual scope. Missing ACL and grants sections use Headscale's default allow-all;
 an explicit empty ACL array allows no connections.
 
+User references follow Headscale: a trailing `@` is removed, OIDC provider IDs
+take precedence, and names/emails must match a unique user in the full catalog.
+
 The graph resolves users, groups, tags, host aliases, IPv4/IPv6 addresses and
 prefixes, and `autogroup:member`, `autogroup:tagged`, `autogroup:self`.
 Tagged machines are identified by their tags rather than their original owner.

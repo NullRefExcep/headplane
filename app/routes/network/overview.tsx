@@ -6,7 +6,7 @@ import Input from "~/components/input";
 import Link from "~/components/link";
 import PageError from "~/components/page-error";
 import { authContext, headscaleLiveStoreContext, requestApiContext } from "~/server/context";
-import { nodesResource } from "~/server/headscale/live-store";
+import { nodesResource, usersResource } from "~/server/headscale/live-store";
 import { Capabilities } from "~/server/web/roles";
 import { buildNetworkGraph } from "~/utils/network-graph";
 
@@ -22,9 +22,10 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     throw data("You need permission to read machines and policy.", { status: 403 });
   }
   const { api } = await context.get(requestApiContext)(request);
-  const [snapshot, policy] = await Promise.all([
+  const [snapshot, policy, users] = await Promise.all([
     context.get(headscaleLiveStoreContext).get(nodesResource, api),
     api.policy.get(),
+    context.get(headscaleLiveStoreContext).get(usersResource, api),
   ]);
   // A failed policy request must never be interpreted as an allow-all policy.
   const nodes = snapshot.data.map(({ id, givenName, name, ipAddresses, tags, user, online }) => ({
@@ -35,7 +36,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     owner: user?.name,
     online,
   }));
-  return { nodes, ...buildNetworkGraph(snapshot.data, policy.policy) };
+  return { nodes, ...buildNetworkGraph(snapshot.data, policy.policy, users.data) };
 }
 
 export default function Network({ loaderData: { nodes, edges, warnings } }: Route.ComponentProps) {
@@ -143,7 +144,7 @@ export default function Network({ loaderData: { nodes, edges, warnings } }: Rout
         <span className="text-orange-600">→ Incoming</span>
         <span className="text-violet-500">→ Overview</span>
         <span>
-          {nodes.length} machines · {edges.length} directed connections
+          {nodes.length} machines · {edges.length} allowed connections
         </span>
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
@@ -272,7 +273,7 @@ export default function Network({ loaderData: { nodes, edges, warnings } }: Rout
               </p>
               <p className="break-all opacity-70">{focus.ipAddresses.join(" · ")}</p>
               <p className="break-all opacity-70">{focus.tags.join(" · ")}</p>
-              <p>{details.length} directed connections</p>
+              <p>{details.length} allowed connections</p>
               <div className="max-h-[440px] space-y-3 overflow-auto">
                 {details.map((edge) => {
                   const outgoing = edge.source === focus.id;

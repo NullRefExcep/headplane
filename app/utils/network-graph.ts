@@ -1,4 +1,4 @@
-import type { Machine } from "~/types";
+import type { Machine, User } from "~/types";
 import { hasPortSpec, parsePolicy } from "~/utils/acl-policy";
 
 export interface NetworkEdge {
@@ -38,7 +38,15 @@ function contains(prefix: string, ip: string): boolean {
   return a.value >> shift === b.value >> shift;
 }
 
-export function buildNetworkGraph(nodes: Machine[], raw: string) {
+export function buildNetworkGraph(
+  nodes: Machine[],
+  raw: string,
+  users: User[] = [
+    ...new Map(
+      nodes.flatMap((node) => (node.user ? [[node.user.id, node.user] as const] : [])),
+    ).values(),
+  ],
+) {
   const parsed = parsePolicy(raw);
   if (!parsed.ok)
     return {
@@ -79,11 +87,15 @@ export function buildNetworkGraph(nodes: Machine[], raw: string) {
     if (address(selector.split("/")[0]))
       return node.ipAddresses.some((ip) => contains(selector, ip));
     if (selector.endsWith("@") || selector.includes("@")) {
-      return (
-        node.tags.length === 0 &&
-        !!node.user &&
-        [node.user.name, `${node.user.name}@`, node.user.email].includes(selector)
-      );
+      if (node.tags.length > 0 || !node.user) return false;
+      // Headscale trims a trailing @, prefers the OIDC provider identifier,
+      // then accepts a unique name/email match across the entire user catalog.
+      const identity = selector.endsWith("@") ? selector.slice(0, -1) : selector;
+      const providerUser = users.find((user) => user.providerId === identity);
+      if (providerUser) return node.user.id === providerUser.id;
+      const candidates = users.filter((user) => user.name === identity || user.email === identity);
+      if (candidates.length > 1) return unsupported(`Ambiguous user: ${selector}`);
+      return candidates.length === 1 && node.user.id === candidates[0].id;
     }
     return unsupported(selector);
   }
