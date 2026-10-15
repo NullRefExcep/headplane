@@ -1,12 +1,8 @@
 # Next
 
-The `__INTERNAL_PREFIX` build variable has been removed. Use `server.base_path`
-in your configuration to keep a custom dashboard URL prefix.
-
 ## Changes
 
 - Added machine IP address editing for Headscale development builds that provide the node IP assignment API.
-- Configure the dashboard URL prefix with `server.base_path` without rebuilding Headplane. Existing installations continue to use `/admin` by default (closes [#637](https://github.com/tale/headplane/issues/637)).
 
 # 0.8.0 (October 13, 2026)
 

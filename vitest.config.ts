@@ -3,6 +3,11 @@ import { resolve } from "node:path";
 
 import { defineConfig } from "vitest/config";
 
+const prefix = process.env.__INTERNAL_PREFIX || "/admin";
+if (prefix.endsWith("/")) {
+  throw new Error("Prefix must not end with a slash");
+}
+
 // Load the version via package.json
 const pkg = await readFile("package.json", "utf-8");
 const isNext = process.env.IMAGE_TAG?.includes("next");
@@ -56,10 +61,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~": resolve(import.meta.dirname, "./app"),
+      "~": resolve(__dirname, "./app"),
     },
   },
   define: {
     __VERSION__: JSON.stringify(isNext ? `${version}-next` : version),
+    __PREFIX__: JSON.stringify(prefix),
   },
 });

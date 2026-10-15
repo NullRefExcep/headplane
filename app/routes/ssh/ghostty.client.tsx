@@ -3,7 +3,7 @@ import { Restty } from "restty";
 import type { GhosttyTheme } from "restty";
 import type { PtyTransport } from "restty/internal";
 
-import { getPrefix } from "~/utils/prefix";
+const FONT_BASE = `${__PREFIX__}/fonts`;
 
 // Ghostty's default canvas background is rgb(20,23,26) — a dark gray, not black.
 // Override it so the terminal matches the page and pane container backgrounds.
@@ -103,27 +103,27 @@ export default function Ghostty({ ipn, ipAddress, username, onConnected }: Ghost
         ligatures: true,
         fonts: [
           {
-            url: `${getPrefix()}/fonts/JetBrainsMonoNLNerdFontMono-Regular.ttf`,
+            url: `${FONT_BASE}/JetBrainsMonoNLNerdFontMono-Regular.ttf`,
             name: "JetBrains Mono Nerd Font",
           },
           {
-            url: `${getPrefix()}/fonts/JetBrainsMonoNLNerdFontMono-Bold.ttf`,
+            url: `${FONT_BASE}/JetBrainsMonoNLNerdFontMono-Bold.ttf`,
             name: "JetBrains Mono Nerd Font Bold",
             weight: 700,
           },
           {
-            url: `${getPrefix()}/fonts/JetBrainsMonoNLNerdFontMono-Italic.ttf`,
+            url: `${FONT_BASE}/JetBrainsMonoNLNerdFontMono-Italic.ttf`,
             name: "JetBrains Mono Nerd Font Italic",
             style: "italic",
           },
           {
-            url: `${getPrefix()}/fonts/JetBrainsMonoNLNerdFontMono-BoldItalic.ttf`,
+            url: `${FONT_BASE}/JetBrainsMonoNLNerdFontMono-BoldItalic.ttf`,
             name: "JetBrains Mono Nerd Font Bold Italic",
             weight: 700,
             style: "italic",
           },
           {
-            url: `${getPrefix()}/fonts/SymbolsNerdFontMono-Regular.ttf`,
+            url: `${FONT_BASE}/SymbolsNerdFontMono-Regular.ttf`,
             name: "Symbols Nerd Font",
           },
         ],
